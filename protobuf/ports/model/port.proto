@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package ports.model;
+option go_package = "golang-microservices-demo/protobuf/ports/model";
+
+message Port {
+    string id = 1;
+    string name = 2;
+    string city = 3;
+    string country = 4;
+    repeated string alias = 5;
+    repeated string regions = 6;
+    repeated double coordinated = 7;
+    string province = 8;
+    string timezone = 9;
+    repeated string unlocs = 10;
+    string code = 11;
+}

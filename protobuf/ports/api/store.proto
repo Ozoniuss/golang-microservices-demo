@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package ports.api;
+option go_package = "golang-microservices-demo/protobuf/ports/api";
+
+import "ports/model/port.proto";
+
+service Ports {
+    rpc StreamPorts(StreamPortsRequest) returns (stream StreamPortsResponse) {}
+}
+
+// StreamPortsRequest starts streaming ports from the provided file.
+message StreamPortsRequest{
+    string file = 1;
+}
+
+//GetPortResponse defines the response for a getPort call
+message StreamPortsResponse{
+   ports.model.Port port = 1;
+}
