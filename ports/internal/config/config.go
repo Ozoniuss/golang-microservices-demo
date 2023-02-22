@@ -6,6 +6,7 @@ type Config struct {
 }
 
 type Database struct {
+	Inmemory bool
 	Host     string
 	Port     int32
 	User     string
@@ -16,4 +17,9 @@ type Database struct {
 type Server struct {
 	Address string
 	Port    int32
+}
+
+func newConfig() Config {
+	c := Config{}
+	return c
 }

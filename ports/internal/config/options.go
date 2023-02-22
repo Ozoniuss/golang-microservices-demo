@@ -1,15 +1,13 @@
 package config
 
-type ConfigOption struct {
-	FlagName  string
-	Shorthand string
-	Value     any
-	Usage     string
-	ConfigKey string
-}
+import (
+	"fmt"
 
-func databaseOptions() []ConfigOption {
-	return []ConfigOption{
+	cfg "github.com/Ozoniuss/configer"
+)
+
+func databaseOptions() []cfg.ConfigOption {
+	return []cfg.ConfigOption{
 		{FlagName: "db-name", Shorthand: "", Value: "ports_db", ConfigKey: "database.name",
 			Usage: "Specifies the name of the ports database"},
 		{FlagName: "db-host", Shorthand: "", Value: "127.0.0.1", ConfigKey: "database.host",
@@ -23,8 +21,8 @@ func databaseOptions() []ConfigOption {
 	}
 }
 
-func serverOptions() []ConfigOption {
-	return []ConfigOption{
+func serverOptions() []cfg.ConfigOption {
+	return []cfg.ConfigOption{
 		{FlagName: "server-address", Shorthand: "", Value: "127.0.0.1", ConfigKey: "server.address",
 			Usage: "Specifies the address on which the ports service listens for incoming calls"},
 		{FlagName: "server-port", Shorthand: "", Value: int32(9000), ConfigKey: "server.port",
@@ -32,9 +30,28 @@ func serverOptions() []ConfigOption {
 	}
 }
 
-func allOptions() []ConfigOption {
-	opts := make([]ConfigOption, 0)
+func allOptions() []cfg.ConfigOption {
+	opts := make([]cfg.ConfigOption, 0)
 	opts = append(opts, databaseOptions()...)
 	opts = append(opts, serverOptions()...)
 	return opts
+}
+
+func ParseConfig() (Config, error) {
+	c := newConfig()
+
+	parserOptions := []cfg.ParserOption{
+		cfg.WithConfigName("config"),
+		cfg.WithConfigType("yml"),
+		cfg.WithConfigPath("./configs"),
+		cfg.WithEnvPrefix("PORTS"),
+		cfg.WithEnvKeyReplacer("_"),
+		cfg.WithWriteFlag(),
+	}
+
+	err := cfg.NewConfig(&c, allOptions(), parserOptions...)
+	if err != nil {
+		return newConfig(), fmt.Errorf("could not create config: %w", err)
+	}
+	return c, nil
 }
