@@ -1,20 +1,26 @@
 syntax = "proto3";
 
 package ports.api;
-option go_package = "golang-microservices-demo/protobuf/ports/api";
+option go_package = "github.com/Ozoniuss/golang-microservices-demo/protobuf/ports/api";
 
 import "ports/model/port.proto";
+import "google/rpc/status.proto";
 
 service Ports {
-    rpc StreamPorts(StreamPortsRequest) returns (stream StreamPortsResponse) {}
+    rpc StreamPorts(stream StreamPortsRequest) returns (StreamPortsResponse) {}
 }
 
-// StreamPortsRequest starts streaming ports from the provided file.
 message StreamPortsRequest{
-    string file = 1;
+   oneof message {
+      PortList data = 1;
+      google.rpc.Status error = 2;
+   }
 }
 
 //GetPortResponse defines the response for a getPort call
 message StreamPortsResponse{
-   ports.model.Port port = 1;
+}
+
+message PortList {
+   repeated ports.model.Port ports = 1;
 }

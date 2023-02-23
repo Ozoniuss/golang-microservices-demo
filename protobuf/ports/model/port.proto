@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package ports.model;
-option go_package = "golang-microservices-demo/protobuf/ports/model";
+option go_package = "github.com/Ozoniuss/golang-microservices-demo/protobuf/ports/model";
 
 message Port {
     string id = 1;

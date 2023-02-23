@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PortsClient interface {
-	StreamPorts(ctx context.Context, in *StreamPortsRequest, opts ...grpc.CallOption) (Ports_StreamPortsClient, error)
+	StreamPorts(ctx context.Context, opts ...grpc.CallOption) (Ports_StreamPortsClient, error)
 }
 
 type portsClient struct {
@@ -33,23 +33,18 @@ func NewPortsClient(cc grpc.ClientConnInterface) PortsClient {
 	return &portsClient{cc}
 }
 
-func (c *portsClient) StreamPorts(ctx context.Context, in *StreamPortsRequest, opts ...grpc.CallOption) (Ports_StreamPortsClient, error) {
+func (c *portsClient) StreamPorts(ctx context.Context, opts ...grpc.CallOption) (Ports_StreamPortsClient, error) {
 	stream, err := c.cc.NewStream(ctx, &Ports_ServiceDesc.Streams[0], "/ports.api.Ports/StreamPorts", opts...)
 	if err != nil {
 		return nil, err
 	}
 	x := &portsStreamPortsClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
 	return x, nil
 }
 
 type Ports_StreamPortsClient interface {
-	Recv() (*StreamPortsResponse, error)
+	Send(*StreamPortsRequest) error
+	CloseAndRecv() (*StreamPortsResponse, error)
 	grpc.ClientStream
 }
 
@@ -57,7 +52,14 @@ type portsStreamPortsClient struct {
 	grpc.ClientStream
 }
 
-func (x *portsStreamPortsClient) Recv() (*StreamPortsResponse, error) {
+func (x *portsStreamPortsClient) Send(m *StreamPortsRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *portsStreamPortsClient) CloseAndRecv() (*StreamPortsResponse, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
 	m := new(StreamPortsResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -69,7 +71,7 @@ func (x *portsStreamPortsClient) Recv() (*StreamPortsResponse, error) {
 // All implementations must embed UnimplementedPortsServer
 // for forward compatibility
 type PortsServer interface {
-	StreamPorts(*StreamPortsRequest, Ports_StreamPortsServer) error
+	StreamPorts(Ports_StreamPortsServer) error
 	mustEmbedUnimplementedPortsServer()
 }
 
@@ -77,7 +79,7 @@ type PortsServer interface {
 type UnimplementedPortsServer struct {
 }
 
-func (UnimplementedPortsServer) StreamPorts(*StreamPortsRequest, Ports_StreamPortsServer) error {
+func (UnimplementedPortsServer) StreamPorts(Ports_StreamPortsServer) error {
 	return status.Errorf(codes.Unimplemented, "method StreamPorts not implemented")
 }
 func (UnimplementedPortsServer) mustEmbedUnimplementedPortsServer() {}
@@ -94,15 +96,12 @@ func RegisterPortsServer(s grpc.ServiceRegistrar, srv PortsServer) {
 }
 
 func _Ports_StreamPorts_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(StreamPortsRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(PortsServer).StreamPorts(m, &portsStreamPortsServer{stream})
+	return srv.(PortsServer).StreamPorts(&portsStreamPortsServer{stream})
 }
 
 type Ports_StreamPortsServer interface {
-	Send(*StreamPortsResponse) error
+	SendAndClose(*StreamPortsResponse) error
+	Recv() (*StreamPortsRequest, error)
 	grpc.ServerStream
 }
 
@@ -110,8 +109,16 @@ type portsStreamPortsServer struct {
 	grpc.ServerStream
 }
 
-func (x *portsStreamPortsServer) Send(m *StreamPortsResponse) error {
+func (x *portsStreamPortsServer) SendAndClose(m *StreamPortsResponse) error {
 	return x.ServerStream.SendMsg(m)
+}
+
+func (x *portsStreamPortsServer) Recv() (*StreamPortsRequest, error) {
+	m := new(StreamPortsRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 // Ports_ServiceDesc is the grpc.ServiceDesc for Ports service.
@@ -125,7 +132,7 @@ var Ports_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "StreamPorts",
 			Handler:       _Ports_StreamPorts_Handler,
-			ServerStreams: true,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "ports/api/store.proto",
