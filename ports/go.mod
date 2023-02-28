@@ -5,7 +5,7 @@ go 1.20
 replace github.com/Ozoniuss/golang-microservices-demo/protobuf => ../protobuf
 
 require (
-	github.com/Ozoniuss/configer v0.1.0
+	github.com/Ozoniuss/configer v0.2.0
 	github.com/Ozoniuss/golang-microservices-demo/protobuf v0.0.0-00010101000000-000000000000
 	github.com/Ozoniuss/stdlog v1.0.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
@@ -25,8 +25,8 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
-	github.com/spf13/afero v1.9.3 // indirect
+	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
+	github.com/spf13/afero v1.9.4 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
