@@ -1,5 +1,7 @@
 package config
 
+import "time"
+
 type Config struct {
 	Server   Server
 	Database Database
@@ -15,8 +17,10 @@ type Database struct {
 }
 
 type Server struct {
-	Address string
-	Port    int32
+	Address         string
+	Port            int32
+	Network         string
+	ShutdownTimeout time.Duration
 }
 
 func newConfig() Config {

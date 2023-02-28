@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"time"
 
 	cfg "github.com/Ozoniuss/configer"
 )
@@ -31,6 +32,10 @@ func serverOptions() []cfg.ConfigOption {
 			Usage: "Specifies the address on which the ports service listens for incoming calls"},
 		{FlagName: "server-port", Shorthand: "", Value: int32(9000), ConfigKey: "server.port",
 			Usage: "Specifies the port on which the ports service listens for incoming calls"},
+		{FlagName: "server-network", Shorthand: "", Value: "tcp", ConfigKey: "server.network",
+			Usage: "Specifies the network protocol available for connecting to the gRPC server. See net.Listen for possible values."},
+		{FlagName: "server-shutdown-timeout", Shorthand: "", Value: 30 * time.Second, ConfigKey: "server.shutdowntimeout",
+			Usage: "Specifies the maximum amount of time the server is allowed to perform a graceful shutdown."},
 	}
 }
 

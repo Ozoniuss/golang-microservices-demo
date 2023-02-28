@@ -67,7 +67,7 @@ func serveGRPC(grpcServer *grpc.Server, config config.Server) error {
 			log.Infoln("Server shut down.")
 
 		// Timeout, do not allow the server to shut down forever.
-		case <-time.After(30 * time.Second):
+		case <-time.After(config.ShutdownTimeout):
 			grpcServer.Stop()
 			log.Infoln("Server shut down after timeout.")
 		}
