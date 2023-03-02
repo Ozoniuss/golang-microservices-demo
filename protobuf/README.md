@@ -1,6 +1,6 @@
 # Protobuf
 
-The `protobuf` folder contains the protobuf representation of the messages that can be used to communicate between the APIs. Protobuf is a flexible and efficient solution to encoding data into binary format. The gRPC protocol is built on top of HTTP and can use the protobuf data format to enable communication via RPC-style calls. The serialization happens very quickly with a small payload, which makes it ideal for low-latency communication between microservices.
+The `protobuf` folder contains the protobuf representation of the messages that can be used to communicate between the APIs. Protobuf is a flexible and efficient solution to encoding data into binary format. The gRPC protocol is built on top of HTTP/2 and can use the protobuf data format to enable communication via RPC-style calls. The serialization happens very quickly with a small payload, which makes it ideal for low-latency communication between microservices.
 
 The folder contains a typical protobuf structure, coming with a `ports` folder holding all the protobuf messages of the ports service. The go code will be generated inside this folder, and thus a go module has been provided in order to enable access to it inside other services. The folder can easily be extended to contain protobufs for multiple services, by simply adding a new folder for any new service.
 
