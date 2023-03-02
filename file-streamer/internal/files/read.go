@@ -2,9 +2,10 @@ package files
 
 import (
 	"fmt"
-	"golang-microservices-demo/file-streamer/internal/config"
 	"os"
 	"path"
+
+	"github.com/Ozoniuss/golang-microservices-demo/file-streamer/internal/config"
 )
 
 // OpenFile opens the file with the provided filename, given the files

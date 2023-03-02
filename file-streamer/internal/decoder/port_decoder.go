@@ -3,7 +3,8 @@ package decoder
 import (
 	"encoding/json"
 	"errors"
-	pb "golang-microservices-demo/protobuf/ports/model"
+
+	pb "github.com/Ozoniuss/golang-microservices-demo/protobuf/ports/model"
 )
 
 // PortDecoder is the underlying object that handles decoding ports from a
@@ -55,7 +56,7 @@ func NewPortDecoder() *PortDecoder {
 //	    ...
 //	    "X": {},
 //	}
-func (p *PortDecoder) Decode(stream []byte) (map[string]pb.PortData, error) {
+func (p *PortDecoder) Decode(stream []byte) (map[string]pb.Port, error) {
 
 	if len(stream) == 0 {
 		return nil, errors.New("empty buffer not allowed")
@@ -171,7 +172,7 @@ func (p *PortDecoder) Decode(stream []byte) (map[string]pb.PortData, error) {
 	data = append(prefix, data...)
 	data = append(data, suffix...)
 
-	ports := make(map[string]pb.PortData)
+	ports := make(map[string]pb.Port)
 	err := json.Unmarshal(data, &ports)
 
 	if err != nil {
