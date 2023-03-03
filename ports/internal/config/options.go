@@ -19,6 +19,8 @@ func databaseOptions() []cfg.ConfigOption {
 			Usage: "Specifies the user which connects to the ports database"},
 		{FlagName: "db-password", Shorthand: "", Value: "userpassword", ConfigKey: "database.password",
 			Usage: "Specifies the password of the user which connects to the ports database"},
+		{FlagName: "db-batchsize", Shorthand: "", Value: 100, ConfigKey: "database.batchsize",
+			Usage: "Specifies the maximum batch size for a batch insert operation"},
 
 		// Should be a string or enum for multiple databases. In this case it's fine.
 		{FlagName: "db-inmemory", Shorthand: "", Value: true, ConfigKey: "database.inmemory",

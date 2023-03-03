@@ -11,7 +11,8 @@ import (
 // PortsDatabase holds the connection to the postgres database server, as well
 // as the database configuration.
 type PortsDatabase struct {
-	db *gorm.DB
+	db     *gorm.DB
+	config config.Database
 }
 
 func NewPortsDatabase(config config.Database) (store.Store, error) {
@@ -20,7 +21,8 @@ func NewPortsDatabase(config config.Database) (store.Store, error) {
 		return nil, fmt.Errorf("could not connect to postgres database: %w", err)
 	}
 	p := PortsDatabase{
-		db: db,
+		db:     db,
+		config: config,
 	}
 	return &p, nil
 }

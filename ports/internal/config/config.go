@@ -8,12 +8,13 @@ type Config struct {
 }
 
 type Database struct {
-	Inmemory bool
-	Host     string
-	Port     int32
-	User     string
-	Name     string
-	Password string
+	Inmemory  bool
+	Host      string
+	Port      int32
+	User      string
+	Name      string
+	Password  string
+	BatchSize int
 }
 
 type Server struct {
