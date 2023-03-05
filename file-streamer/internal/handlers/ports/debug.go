@@ -7,6 +7,7 @@ import (
 
 	"github.com/Ozoniuss/golang-microservices-demo/file-streamer/internal/decoder"
 	"github.com/Ozoniuss/golang-microservices-demo/file-streamer/internal/files"
+	"github.com/Ozoniuss/golang-microservices-demo/file-streamer/internal/handlers/common"
 	"github.com/Ozoniuss/golang-microservices-demo/protobuf/ports/api"
 	"github.com/gin-gonic/gin"
 
@@ -17,27 +18,22 @@ func (h *handler) handleDebugLocalFile(ctx *gin.Context) {
 
 	filename := ctx.Param("filename")
 	if filename == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": NewLocalFileDebugError(http.StatusBadRequest, "Missing filename query parameter."),
-		})
+		common.EmitError(ctx, NewLocalFileDebugError(http.StatusBadRequest, "Missing filename query parameter."))
 		return
 	}
 
 	// Debug opening file.
 	f, err := files.OpenFile(filename, h.config.Files)
 	if err != nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"error": NewLocalFileStreamingFailedError(http.StatusOK,
-				fmt.Sprintf("Error opening file %s: %s", filename, err.Error())),
-		})
-	}
+		common.EmitError(ctx, NewLocalFileStreamingFailedError(http.StatusOK,
+			fmt.Sprintf("Error opening file %s: %s", filename, err.Error())))
+		return
 
+	}
 	var req portsapi.DebugRequest
 	if err := ctx.BindQuery(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": NewLocalFileDebugError(http.StatusBadGateway,
-				fmt.Sprintf("invalid query parameters: %s", err.Error())),
-		})
+		common.EmitError(ctx, NewLocalFileDebugError(http.StatusBadRequest,
+			fmt.Sprintf("invalid query parameters: %s", err.Error())))
 		return
 	}
 
@@ -77,8 +73,10 @@ func (h *handler) handleDebugLocalFile(ctx *gin.Context) {
 		passes += 1
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"Ports read":    count,
-		"Buffer passes": passes,
-	})
+	resp := portsapi.DebugResponse{
+		PortsRead:    count,
+		BufferPasses: passes,
+	}
+
+	ctx.JSON(http.StatusOK, &resp)
 }
