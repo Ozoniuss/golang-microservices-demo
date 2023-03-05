@@ -7,7 +7,7 @@ import (
 
 	"github.com/Ozoniuss/golang-microservices-demo/file-streamer/internal/decoder"
 	"github.com/Ozoniuss/golang-microservices-demo/file-streamer/internal/files"
-	public "github.com/Ozoniuss/golang-microservices-demo/file-streamer/pkg"
+	common "github.com/Ozoniuss/golang-microservices-demo/file-streamer/internal/handlers/common"
 	"github.com/Ozoniuss/golang-microservices-demo/protobuf/ports/api"
 	proto "github.com/Ozoniuss/golang-microservices-demo/protobuf/ports/model"
 	log "github.com/Ozoniuss/stdlog"
@@ -19,28 +19,16 @@ func (h *handler) handleLocalPortStream(ctx *gin.Context) {
 
 	filename := ctx.Param("filename")
 	if filename == "" {
-		err := public.Error{
-			Status: http.StatusBadRequest,
-			Title:  "File streaming failed",
-			Detail: "Missing filename query parameter.",
-		}
-		ctx.JSON(500, gin.H{
-			"error": err,
-		})
+		common.EmitError(ctx, NewLocalFileStreamingFailedError(http.StatusBadRequest, "Missing filename query parameter."))
 		return
 	}
 
 	f, err := files.OpenFile(filename, h.config.Files)
 	if err != nil {
 		log.Errf("could not open file with name %s: %w", filename, err)
-		clientErr := public.Error{
-			Status: http.StatusBadRequest,
-			Title:  "File streaming failed",
-			Detail: fmt.Sprintf("Could not open file with name %s. Make sure the provided name is valid.", filename),
-		}
-		ctx.JSON(500, gin.H{
-			"error": clientErr,
-		})
+		common.EmitError(ctx, NewLocalFileStreamingFailedError(http.StatusBadRequest,
+			fmt.Sprintf("Could not open file with name %s."+
+				" Make sure the provided name is valid, and the file exists on the server.", filename)))
 	}
 
 	buf := make([]byte, h.config.PortService.Decoder.Bufsize)

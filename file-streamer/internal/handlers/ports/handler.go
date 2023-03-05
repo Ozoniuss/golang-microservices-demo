@@ -29,8 +29,12 @@ func RegisterPorts(router *gin.Engine, config config.Config, conn *grpc.ClientCo
 
 	h := NewHandler(conn, config)
 
-	filestreamRouter := router.Group("/api/local/:filename")
+	filestreamRouter := router.Group("/api/ports/local")
 	{
-		filestreamRouter.POST("", h.handleLocalPortStream)
+		filestreamRouter.POST("/::filename", h.handleLocalPortStream)
+	}
+	debugRouter := router.Group("/api/ports/debug")
+	{
+		debugRouter.GET("/:filename", h.handleDebugLocalFile)
 	}
 }
